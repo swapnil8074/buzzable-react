@@ -1,26 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { Switch, Route } from "react-router-dom";
+import Login from "./containers/login/Login";
+import Signup from "./containers/signup/Signup";
+import Home from "./containers/homePage/Homepage";
+import { loadUser } from "./actions/authActions";
+import { connect } from "react-redux";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  componentDidMount() {
+    // load user after component get mounted to Dom
+    // this.props.loadUser();
+  }
+  render() {
+    return (
+      <div className="App">
+        <Switch>
+          <Route path="/" exact>
+            <Home />
+          </Route>
+          <Route path="/login">
+            <Login />
+          </Route>
+          <Route path="/sign-up">
+            <Signup />
+          </Route>
+          <Route path="*">
+            <h1>Not Found</h1>
+          </Route>
+        </Switch>
+      </div>
+    );
+  }
 }
+const mapDispatchToProps = dispatch => {
+  return {
+    loadUser: () => {
+      dispatch(loadUser());
+    }
+  };
+};
+
+const mapStateToProps = store => {
+  return {};
+};
+
+App = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);
 
 export default App;
