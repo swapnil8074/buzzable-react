@@ -44,4 +44,10 @@ export const tokenConfig = getState => {
   return config;
 };
 
-export const registerUser = () => (dispatch, getState) => {};
+export const registerUser = user => dispatch => {
+  console.log(user);
+  dispatch({ type: USER_LOADING });
+  setTimeout(() => {
+    dispatch({ type: USER_LOADED });
+  }, 5000);
+};

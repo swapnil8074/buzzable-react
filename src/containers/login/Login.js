@@ -22,7 +22,7 @@ class Login extends Component {
   };
 
   // login form submit handler
-  formSubmit = (values, { setSubmitting }) => {
+  handleLoginSubmit = (values, { setSubmitting }) => {
     let response = Axios.post("/auth/login", values);
     console.log(response.data);
     setSubmitting(false);
@@ -31,7 +31,7 @@ class Login extends Component {
   render() {
     return (
       <Fragment>
-        <div className="container-fluid">
+        <Container fluid>
           <div className="row">
             <div className="left-login col-lg-6 col-xl-6">
               <img
@@ -58,13 +58,7 @@ class Login extends Component {
                     password: ""
                   }}
                   validationSchema={validationSchema}
-                  onSubmit={(values, { setSubmitting }) => {
-                    console.log("asdjhasd");
-                    setTimeout(() => {
-                      alert(JSON.stringify(values, null, 2));
-                      setSubmitting(false);
-                    }, 400);
-                  }}
+                  onSubmit={this.handleLoginSubmit}
                 >
                   {({
                     handleChange,
@@ -76,6 +70,7 @@ class Login extends Component {
                     errors
                   }) => (
                     <Form
+                      noValidate
                       className="form"
                       autoComplete="off"
                       onSubmit={handleSubmit}
@@ -90,10 +85,14 @@ class Login extends Component {
                           name="email"
                           onBlur={handleBlur}
                           onChange={handleChange}
+                          isInvalid={touched.email && errors.email}
                         />
-                        <Form.Text className="text-muted">
-                          Enter email. {errors.email}
-                        </Form.Text>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.email}
+                        </Form.Control.Feedback>
+                        {/* <Form.Text className="text-muted">
+                          Enter email.
+                        </Form.Text> */}
                       </Form.Group>
                       <Form.Group controlId="password">
                         <Form.Label>Password</Form.Label>
@@ -105,11 +104,15 @@ class Login extends Component {
                           value={values.password}
                           onChange={handleChange}
                           onBlur={handleBlur}
+                          isInvalid={touched.password && errors.password}
                         />
-                        
-                        <Form.Text className="text-muted">
+                        <Form.Control.Feedback type="invalid">
+                          {errors.password}
+                        </Form.Control.Feedback>
+
+                        {/* <Form.Text className="text-muted">
                           Enter password
-                        </Form.Text>
+                        </Form.Text> */}
                       </Form.Group>
                       <Button type="submit" variant="" disabled={isSubmitting}>
                         Submit
@@ -128,7 +131,7 @@ class Login extends Component {
               </div>
             </div>
           </div>
-        </div>
+        </Container>
         <Link className="pageclose" to="/">
           &times;
         </Link>
@@ -145,11 +148,6 @@ class Login extends Component {
 //     }
 //   };
 // };
-
-// return connect(
-//   mapStateToProps,
-//   mapDispatchToProps
-// )(Login);
 
 const validationSchema = yup.object().shape({
   email: yup

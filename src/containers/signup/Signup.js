@@ -1,24 +1,17 @@
 import React, { Component, Fragment } from "react";
 import { Link } from "react-router-dom";
-import { Image, Container, Row, Col, Form } from "react-bootstrap";
+import { Image, Container, Row, Col, Form, Spinner } from "react-bootstrap";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { registerUser } from "../../actions/authActions";
 import { connect } from "react-redux";
-// import PropTypes from "prop-types";
+import PropTypes from "prop-types";
 
 class Signup extends Component {
-  state = {
-    form: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: ""
-    }
-  };
-
-  handleFormSubmit = () => {
-    console.log("Form submit button is getting clicked");
+  handleRegisterSubmit = (values, { setSubmitting }) => {
+    this.props.registerUser(values);
+    // console.log("Form submit button is getting clicked");
+    // console.log(values);
   };
 
   render() {
@@ -47,19 +40,30 @@ class Signup extends Component {
 
                 {/* Login Form */}
                 <Formik
-                  initialValues={this.state.form}
+                  initialValues={{
+                    name: "swapnil",
+                    email: "swapnil@gmail.com",
+                    password: "swapnil",
+                    confirmPassword: "swapnil"
+                  }}
                   validationSchema={signupValidationScema}
-                  onSubmit={this.handleFormSubmit}
+                  onSubmit={this.handleRegisterSubmit}
                 >
                   {({
                     handleChange,
                     values,
                     isSubmitting,
+                    handleBlur,
                     errors,
                     touched,
                     handleSubmit
                   }) => (
-                    <Form className="form" onSubmit={handleSubmit}>
+                    <Form
+                      noValidate
+                      className="form"
+                      autoComplete="off"
+                      onSubmit={handleSubmit}
+                    >
                       <Form.Group controlId="name">
                         <Form.Label>Name</Form.Label>
                         <Form.Control
@@ -68,14 +72,14 @@ class Signup extends Component {
                           className="envelop"
                           name="name"
                           value={values.name}
+                          onBlur={handleBlur}
                           onChange={handleChange}
+                          isInvalid={touched.name && errors.name}
                         />
 
-                        {touched.name && errors.name && (
-                          <Form.Control.Feedback>
-                            errors.name
-                          </Form.Control.Feedback>
-                        )}
+                        <Form.Control.Feedback type="invalid">
+                          {errors.name}
+                        </Form.Control.Feedback>
                         {/*  <Form.Text className="text-muted">
                           Enter name.
                         </Form.Text> */}
@@ -87,9 +91,14 @@ class Signup extends Component {
                           placeholder="user@mail.com"
                           className="envelop"
                           name="email"
+                          onBlur={handleBlur}
                           value={values.email}
                           onChange={handleChange}
+                          isInvalid={touched.email && errors.email}
                         />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.email}
+                        </Form.Control.Feedback>
                         {/*  <Form.Text className="text-muted">
                           Enter email.
                         </Form.Text> */}
@@ -103,11 +112,14 @@ class Signup extends Component {
                           name="password"
                           value={values.password}
                           onChange={handleChange}
+                          onBlur={handleBlur}
+                          isInvalid={touched.password && errors.password}
                         />
-                        {/* <Form.Text className="text-muted">
-                          Enter password
-                        </Form.Text> */}
+                        <Form.Control.Feedback type="invalid">
+                          {errors.password}
+                        </Form.Control.Feedback>
                       </Form.Group>
+
                       <Form.Group controlId="cpassword">
                         <Form.Label>Confirm Password</Form.Label>
                         <Form.Control
@@ -117,17 +129,37 @@ class Signup extends Component {
                           name="confirmPassword"
                           value={values.confirmPassword}
                           onChange={handleChange}
+                          onBlur={handleBlur}
+                          isInvalid={
+                            touched.confirmPassword && errors.confirmPassword
+                          }
                         />
-                        {/* <Form.Text className="text-muted">
-                          Enter password
-                        </Form.Text> */}
+                        <Form.Control.Feedback type="invalid">
+                          {errors.confirmPassword}
+                        </Form.Control.Feedback>
                       </Form.Group>
                       <button
                         type="submit"
                         className="btn"
                         disabled={isSubmitting}
                       >
-                        Submit
+
+                        { if(this.props.authLoading){
+sasds
+                        }else{
+das
+                        } }
+                        {this.props.authLoading && 
+                          <Spinner
+                          as="span"
+                          animation="grow"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                        />
+                        Loading...
+                        }
+                        {!this.props.authLoading && "Submit"}
                       </button>
                     </Form>
                   )}
@@ -158,25 +190,25 @@ const signupValidationScema = Yup.object().shape({
   name: Yup.string().required(),
   email: Yup.string()
     .email("Email is not valid!")
-    .required("Email is required"),
+    .required("Email is required!"),
   password: Yup.string()
-    .min(4, "Password must be 4 character or longer")
-    .required("Password is required")
+    .min(4, "Password must be 4 character or longer!")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Passwords must match!")
+    .required("Confirm password is required!")
 });
 
-// Signup.propTypes = {
-//   isAuthenticated =
-// }
+Signup.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  authLoading: PropTypes.bool.isRequired
+};
 
-// const mapDispatchToProps = dispatch => {
-//   return {
-//     registerUser: formData => {
-//       dispatch(registerUser(formData));
-//     }
-//   };
-// };
+const mapStateToProps = state => ({
+  authLoading: state.auth.isLoading
+});
 
 export default connect(
-  null,
-  null
+  mapStateToProps,
+  { registerUser }
 )(Signup);
