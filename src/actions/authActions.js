@@ -45,9 +45,19 @@ export const tokenConfig = getState => {
 };
 
 export const registerUser = user => dispatch => {
-  console.log(user);
   dispatch({ type: USER_LOADING });
-  setTimeout(() => {
-    dispatch({ type: USER_LOADED });
-  }, 5000);
+
+  axios
+    .post("/auth/sign-up", user)
+    .then(userData => {
+      console.log(userData);
+    })
+    .catch(err => {
+      dispatch({ type: REGISTER_FAIL });
+      dispatch(returnErrors({ auth: err.message }));
+    });
+
+  // setTimeout(() => {
+  //   dispatch({ type: USER_LOADED });
+  // }, 5000);
 };

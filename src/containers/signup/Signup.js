@@ -6,12 +6,11 @@ import * as Yup from "yup";
 import { registerUser } from "../../actions/authActions";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import AlertDissmiss from "../../components/alertDismiss";
 
 class Signup extends Component {
-  handleRegisterSubmit = (values, { setSubmitting }) => {
+  handleRegisterSubmit = values => {
     this.props.registerUser(values);
-    // console.log("Form submit button is getting clicked");
-    // console.log(values);
   };
 
   render() {
@@ -37,6 +36,9 @@ class Signup extends Component {
                   <img src="/images/login-logo.png" alt="" />
                   <figcaption>Buzzabl</figcaption>
                 </figure>
+                {this.props.error.msg.auth && (
+                  <AlertDissmiss message={this.props.error.msg.auth} />
+                )}
 
                 {/* Login Form */}
                 <Formik
@@ -141,24 +143,20 @@ class Signup extends Component {
                       <button
                         type="submit"
                         className="btn"
-                        disabled={isSubmitting}
+                        disabled={this.props.authLoading}
                       >
-
-                        { if(this.props.authLoading){
-sasds
-                        }else{
-das
-                        } }
-                        {this.props.authLoading && 
-                          <Spinner
-                          as="span"
-                          animation="grow"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                        />
-                        Loading...
-                        }
+                        {this.props.authLoading && (
+                          <Fragment>
+                            <Spinner
+                              as="span"
+                              animation="grow"
+                              size="sm"
+                              role="status"
+                              aria-hidden="true"
+                            />{" "}
+                            Submitting...
+                          </Fragment>
+                        )}
                         {!this.props.authLoading && "Submit"}
                       </button>
                     </Form>
@@ -205,7 +203,8 @@ Signup.propTypes = {
 };
 
 const mapStateToProps = state => ({
-  authLoading: state.auth.isLoading
+  authLoading: state.auth.isLoading,
+  error: state.errors
 });
 
 export default connect(
